@@ -2,8 +2,9 @@ package com.a.testflowproject
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 
-class NumberViewModel : NumberRepository.NumberChangedListener, ViewModel() {
+class SecondNumberViewModel : NumberRepository.NumberChangedListener, ViewModel() {
 
     var newNumber = MutableLiveData<Int>()
 

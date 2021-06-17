@@ -13,6 +13,11 @@ import kotlinx.android.synthetic.main.fragment_number.view.*
 
 class NumberFragment : Fragment() {
     var numberViewModel: NumberViewModel? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        numberViewModel = NumberViewModel()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -23,10 +28,15 @@ class NumberFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        numberViewModel = NumberViewModel()
-        numberTextView.text = ""
-        numberViewModel?.newNumber?.observe(this as LifecycleOwner, Observer {
+        numberViewModel?.newNumber?.observe(this, Observer<Int>{
             numberTextView.text = it.toString()
-        } )
+        })
+        val mainActivity: MainActivity = requireActivity() as MainActivity
+        secondNumberScreenButton.setOnClickListener { mainActivity.navigateToSecondFragment()  }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        numberViewModel?.removeListener()
     }
 }
