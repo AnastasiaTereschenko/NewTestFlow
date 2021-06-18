@@ -5,10 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.fragment_number.*
-import kotlinx.android.synthetic.main.fragment_number.view.*
+import kotlinx.coroutines.flow.collect
 
 
 class NumberFragment : Fragment() {
@@ -28,11 +27,15 @@ class NumberFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        numberViewModel?.newNumber?.observe(this, Observer<Int>{
-            numberTextView.text = it.toString()
-        })
+        lifecycleScope.launchWhenStarted {
+            numberViewModel?.newNumber?.collect { number ->
+                if (number != 0) {
+                    numberTextView.text = number.toString()
+                }
+            }
+        }
         val mainActivity: MainActivity = requireActivity() as MainActivity
-        secondNumberScreenButton.setOnClickListener { mainActivity.navigateToSecondFragment()  }
+        secondNumberScreenButton.setOnClickListener { mainActivity.navigateToSecondFragment() }
     }
 
     override fun onDestroyView() {

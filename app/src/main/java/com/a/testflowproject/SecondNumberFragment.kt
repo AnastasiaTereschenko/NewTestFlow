@@ -6,16 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import kotlinx.android.synthetic.main.fragment_number.*
-import kotlinx.android.synthetic.main.fragment_number.numberTextView
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.fragment_second_number.*
+import kotlinx.coroutines.flow.collect
 
 class SecondNumberFragment : Fragment() {
-   var secondNumberViewModel = SecondNumberViewModel()
+    var secondNumberViewModel = SecondNumberViewModel()
 
     companion object {
         const val NUMBER = "number"
+
         @JvmStatic
         fun newInstance(number: Int): SecondNumberFragment {
             val args = Bundle()
@@ -28,7 +28,7 @@ class SecondNumberFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("","")
+        Log.d("", "")
         secondNumberViewModel = SecondNumberViewModel()
     }
 
@@ -40,15 +40,19 @@ class SecondNumberFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_second_number, container, false)
     }
 
-override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    secondNumberViewModel?.newNumber?.observe(this, Observer<Int>{
-        secondNumberTextView.text = it.toString()
-    })
-}
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        lifecycleScope.launchWhenStarted {
+            secondNumberViewModel.newNumber.collect { number ->
+                if (number != 0) {
+                    secondNumberTextView.text = number.toString()
+                }
+            }
+        }
+    }
 
-override fun onDestroyView() {
-    super.onDestroyView()
-    secondNumberViewModel?.removeListener()
-}
+    override fun onDestroyView() {
+        super.onDestroyView()
+        secondNumberViewModel.removeListener()
+    }
 }
